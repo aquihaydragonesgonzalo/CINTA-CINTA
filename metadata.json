@@ -1,7 +1,5 @@
 {
-  "name": "CINTA CINTA",
+  "name": "TreadPro",
   "description": "A professional PWA for managing treadmill sessions with speed, incline, and precise interval timers.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
+  "requestFramePermissions": []
 }

@@ -3,30 +3,33 @@ class AudioService {
   private context: AudioContext | null = null;
 
   private init() {
+    if (this.context) return;
     try {
-      if (!this.context) {
-        this.context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        this.context = new AudioContextClass();
       }
     } catch (e) {
-      console.warn("AudioContext no soportado o bloqueado", e);
+      console.error("AudioContext initialization failed", e);
     }
   }
 
-  // Los navegadores móviles requieren llamar a resume() dentro de un evento de usuario
   async resume() {
     this.init();
     if (this.context && this.context.state === 'suspended') {
       try {
         await this.context.resume();
       } catch (e) {
-        console.error("Error al reanudar AudioContext", e);
+        console.warn("Could not resume AudioContext", e);
       }
     }
   }
 
   beep(frequency: number = 880, duration: number = 200) {
-    this.init();
-    if (!this.context || this.context.state !== 'running') return;
+    if (!this.context || this.context.state !== 'running') {
+      this.init();
+      return;
+    }
 
     try {
       const oscillator = this.context.createOscillator();
@@ -44,7 +47,7 @@ class AudioService {
       oscillator.start();
       oscillator.stop(this.context.currentTime + duration / 1000);
     } catch (e) {
-      console.error("Error al reproducir beep", e);
+      console.error("Beep playback failed", e);
     }
   }
 
